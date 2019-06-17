@@ -1,5 +1,3 @@
-package main;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -7,8 +5,8 @@ import java.util.ArrayList;
 
 public class Form extends JFrame implements Runnable {
 
-    private final int w = 1600;
-    private final int h = 1200;
+    private final int w = 1000;
+    private final int h = 800;
 
     private final Color BG = new Color(20, 55, 75, 255);
     private final Color LINK = new Color(255, 230, 0, 100);

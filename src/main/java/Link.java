@@ -1,5 +1,3 @@
-package main;
-
 public class Link {
 
     Particle a;
