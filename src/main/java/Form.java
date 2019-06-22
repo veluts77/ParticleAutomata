@@ -16,7 +16,7 @@ public class Form extends JFrame implements Runnable {
     private final int MAX_DIST = 100;
     private final int MAX_DIST2 = MAX_DIST * MAX_DIST;
     private final float SPEED = 4f;
-    private final int SKIP_FRAMES = 3;
+    private final int SKIP_FRAMES = 1;
     private final int BORDER = 30;
 
     private final int fw = w / MAX_DIST + 1;
@@ -82,13 +82,19 @@ public class Form extends JFrame implements Runnable {
 
     @Override
     public void paint(Graphics g) {
+        long beginTime = System.currentTimeMillis();
         drawScene(img);
         for (int i = 0; i < SKIP_FRAMES; i++) logic();
         ((Graphics2D)g).drawImage(img, null, 8, 30);
         frame++;
+        long endTime = System.currentTimeMillis();
+        String time = String.valueOf(endTime - beginTime);
+        g.setColor(Color.yellow);
+        g.drawString(time, 30, 42);
     }
 
     private void drawScene(BufferedImage image) {
+        long beginTime = System.currentTimeMillis();
         Graphics2D g2 = image.createGraphics();
         g2.setColor(BG);
         g2.fillRect(0, 0, w, h);
@@ -107,6 +113,10 @@ public class Form extends JFrame implements Runnable {
         for (Link link: links) {
             g2.drawLine((int) link.a.x, (int) link.a.y, (int) link.b.x, (int) link.b.y);
         }
+        long endTime = System.currentTimeMillis();
+        String time = String.valueOf(endTime - beginTime);
+        g2.setColor(Color.white);
+        g2.drawString(time, 25, 25);
     }
 
     private void logic() {
