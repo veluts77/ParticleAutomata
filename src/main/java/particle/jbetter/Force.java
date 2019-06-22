@@ -20,7 +20,7 @@ public class Force {
             {1, 1, 2}
     };
 
-    int couplingLength() {
+    public int couplingLength() {
         return COUPLING.length;
     }
 
