@@ -85,7 +85,7 @@ class Form : JFrame(), Runnable {
             for (j in 0 until fh) {
                 val field = fields[i][j]
                 for (i1 in field!!.particles.indices) {
-                    val a = field!!.particles[i1]
+                    val a = field.particles[i1]
                     g2.color = a.color
                     g2.fillOval(a.x.toInt() - NODE_RADIUS, a.y.toInt() - NODE_RADIUS, NODE_RADIUS * 2, NODE_RADIUS * 2)
                 }
@@ -178,13 +178,15 @@ class Form : JFrame(), Runnable {
         for (i in 0 until fw) {
             for (j in 0 until fh) {
                 val field = fields[i][j]
+                val toRemoveParticles = mutableListOf<Particle>()
                 for (i1 in field!!.particles.indices) {
                     val a = field.particles[i1]
                     if ((a.x / MAX_DIST).toInt() != i || (a.y / MAX_DIST).toInt() != j) {
-                        field.particles.remove(a)
+                        toRemoveParticles.add(a)
                         fields[(a.x / MAX_DIST).toInt()][(a.y / MAX_DIST).toInt()]!!.particles.add(a)
                     }
                 }
+                field.particles.removeAll(toRemoveParticles)
             }
         }
         // dividing scene into parts to reduce complexity
@@ -295,11 +297,17 @@ class Form : JFrame(), Runnable {
 
     companion object {
 
-        private val COUPLING = arrayOf(floatArrayOf(1f, 1f, -1f), floatArrayOf(1f, 1f, 1f), floatArrayOf(1f, 1f, 1f))
+        private val COUPLING = arrayOf(
+                floatArrayOf(1f, 1f, -1f),
+                floatArrayOf(1f, 1f, 1f),
+                floatArrayOf(1f, 1f, 1f))
 
         private val LINKS = intArrayOf(1, 3, 2)
 
-        private val LINKS_POSSIBLE = arrayOf(floatArrayOf(0f, 1f, 1f), floatArrayOf(1f, 2f, 1f), floatArrayOf(1f, 1f, 2f))
+        private val LINKS_POSSIBLE = arrayOf(
+                floatArrayOf(0f, 1f, 1f),
+                floatArrayOf(1f, 2f, 1f),
+                floatArrayOf(1f, 1f, 2f))
     }
 
 }
