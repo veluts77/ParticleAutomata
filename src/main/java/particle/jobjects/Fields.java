@@ -32,6 +32,11 @@ class Fields {
         }
     }
 
+    private void addOneParticle(int type, float x, float y) {
+        Particle p = new Particle(ParticleType.values()[type], x, y);
+        fieldFor(p).add(p);
+    }
+
     void eachParticleDo(Consumer<Particle> consumer) {
         for (int i = 0; i < fw; i++) {
             for (int j = 0; j < fh; j++) {
@@ -50,39 +55,26 @@ class Fields {
         }
     }
 
-    private void addOneParticle(int type, float x, float y) {
-        Particle p = new Particle(ParticleType.values()[type], x, y);
-        fieldFor(p).add(p);
-    }
-
     private Field fieldFor(Particle p) {
         return fields[(int) (p.x / MAX_DIST)][(int) (p.y / MAX_DIST)];
     }
 
     void logic() {
-        eachParticleDo(a -> {
-            a.adjustPosition();
-            a.slowDownVelocity();
-            a.normalizeVelocity();
+        eachParticleDo(particle -> {
+            particle.adjustPosition();
+            particle.slowDownVelocity();
+            particle.normalizeVelocity();
         });
 
         for (int i = 0; i < links.size(); i++) {
             Link link = links.get(i);
-            Particle a = link.a;
-            Particle b = link.b;
             float d2 = link.squaredDistance();
             if (d2 > MAX_DIST2 / 4f) {
                 link.unlink();
                 links.remove(link);
                 i--;
-            } else {
-                if (d2 > NODE_RADIUS * NODE_RADIUS * 4) {
-                    double angle = link.angle();
-                    a.sx += (float) Math.cos(angle) * LINK_FORCE * SPEED;
-                    a.sy += (float) Math.sin(angle) * LINK_FORCE * SPEED;
-                    b.sx -= (float) Math.cos(angle) * LINK_FORCE * SPEED;
-                    b.sy -= (float) Math.sin(angle) * LINK_FORCE * SPEED;
-                }
+            } else if (d2 > NODE_RADIUS * NODE_RADIUS * 4) {
+                link.adjustParticlesVelocity();
             }
         }
         // moving particle to another field
@@ -151,10 +143,6 @@ class Fields {
                         }
                     }
                     if (particleToLink != null) {
-                        a.bonds.add(particleToLink);
-                        particleToLink.bonds.add(a);
-                        a.links++;
-                        particleToLink.links++;
                         links.add(new Link(a, particleToLink));
                     }
                 }
