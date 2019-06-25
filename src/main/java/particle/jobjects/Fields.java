@@ -26,9 +26,9 @@ class Fields {
 
     void addRandomParticles() {
         for (int i = 0; i < NODE_COUNT; i++) {
-            addOneParticle((int)(Math.random() * COUPLING.length),
-                    (float)(Math.random() * w),
-                    (float)(Math.random() * h));
+            addOneParticle((int) (Math.random() * COUPLING.length),
+                    (float) (Math.random() * w),
+                    (float) (Math.random() * h));
         }
     }
 
@@ -45,7 +45,7 @@ class Fields {
     }
 
     void eachLinkDo(Consumer<Link> consumer) {
-        for (Link link: links) {
+        for (Link link : links) {
             consumer.accept(link);
         }
     }
@@ -70,22 +70,18 @@ class Fields {
             Link link = links.get(i);
             Particle a = link.a;
             Particle b = link.b;
-            float d2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
-            if(d2 > MAX_DIST2 / 4f) {
-                a.links--;
-                b.links--;
-                a.bonds.remove(b);
-                b.bonds.remove(a);
+            float d2 = link.squaredDistance();
+            if (d2 > MAX_DIST2 / 4f) {
+                link.unlink();
                 links.remove(link);
                 i--;
-            }
-            else {
-                if(d2 > NODE_RADIUS * NODE_RADIUS * 4) {
-                    double angle = Math.atan2(a.y - b.y, a.x - b.x);
-                    a.sx += (float)Math.cos(angle) * LINK_FORCE * SPEED;
-                    a.sy += (float)Math.sin(angle) * LINK_FORCE * SPEED;
-                    b.sx -= (float)Math.cos(angle) * LINK_FORCE * SPEED;
-                    b.sy -= (float)Math.sin(angle) * LINK_FORCE * SPEED;
+            } else {
+                if (d2 > NODE_RADIUS * NODE_RADIUS * 4) {
+                    double angle = link.angle();
+                    a.sx += (float) Math.cos(angle) * LINK_FORCE * SPEED;
+                    a.sy += (float) Math.sin(angle) * LINK_FORCE * SPEED;
+                    b.sx -= (float) Math.cos(angle) * LINK_FORCE * SPEED;
+                    b.sy -= (float) Math.sin(angle) * LINK_FORCE * SPEED;
                 }
             }
         }
@@ -95,7 +91,7 @@ class Fields {
                 Field field = fields[i][j];
                 for (int i1 = 0; i1 < field.totalParticles(); i1++) {
                     Particle a = field.particleByIndex(i1);
-                    if(((int)(a.x / MAX_DIST) != i) || ((int)(a.y / MAX_DIST) != j)) {
+                    if (((int) (a.x / MAX_DIST) != i) || ((int) (a.y / MAX_DIST) != j)) {
                         field.remove(a);
                         fieldFor(a).add(a);
                     }
@@ -113,48 +109,48 @@ class Fields {
                     for (int j1 = i1 + 1; j1 < field.totalParticles(); j1++) {
                         Particle b = field.particleByIndex(j1);
                         float d2 = applyForce(a, b);
-                        if(d2 != -1 && d2 < particleToLinkMinDist2) {
+                        if (d2 != -1 && d2 < particleToLinkMinDist2) {
                             particleToLinkMinDist2 = d2;
                             particleToLink = b;
                         }
                     }
-                    if(i < fw - 1) {
+                    if (i < fw - 1) {
                         int iNext = i + 1;
                         Field field1 = fields[iNext][j];
                         for (int j1 = 0; j1 < field1.totalParticles(); j1++) {
                             Particle b = field1.particleByIndex(j1);
                             float d2 = applyForce(a, b);
-                            if(d2 != -1 && d2 < particleToLinkMinDist2) {
+                            if (d2 != -1 && d2 < particleToLinkMinDist2) {
                                 particleToLinkMinDist2 = d2;
                                 particleToLink = b;
                             }
                         }
                     }
-                    if(j < fh - 1) {
+                    if (j < fh - 1) {
                         int jNext = j + 1;
                         Field field1 = fields[i][jNext];
                         for (int j1 = 0; j1 < field1.totalParticles(); j1++) {
                             Particle b = field1.particleByIndex(j1);
                             float d2 = applyForce(a, b);
-                            if(d2 != -1 && d2 < particleToLinkMinDist2) {
+                            if (d2 != -1 && d2 < particleToLinkMinDist2) {
                                 particleToLinkMinDist2 = d2;
                                 particleToLink = b;
                             }
                         }
-                        if(i < fw - 1) {
+                        if (i < fw - 1) {
                             int iNext = i + 1;
                             Field field2 = fields[iNext][jNext];
                             for (int j1 = 0; j1 < field2.totalParticles(); j1++) {
                                 Particle b = field2.particleByIndex(j1);
                                 float d2 = applyForce(a, b);
-                                if(d2 != -1 && d2 < particleToLinkMinDist2) {
+                                if (d2 != -1 && d2 < particleToLinkMinDist2) {
                                     particleToLinkMinDist2 = d2;
                                     particleToLink = b;
                                 }
                             }
                         }
                     }
-                    if(particleToLink != null) {
+                    if (particleToLink != null) {
                         a.bonds.add(particleToLink);
                         particleToLink.bonds.add(a);
                         a.links++;
@@ -167,48 +163,35 @@ class Fields {
     }
 
     private float applyForce(Particle a, Particle b) {
-        float d2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+        float d2 = a.squaredDistanceTo(b);
         boolean canLink = false;
-        if(d2 < MAX_DIST2) {
-            float dA = COUPLING[a.getType()][b.getType()] / d2;
-            float dB = COUPLING[b.getType()][a.getType()] / d2;
-            if (a.links < LINKS[a.getType()] && b.links < LINKS[b.getType()]) {
-                if(d2 < MAX_DIST2 / 4f) {
-                    if (!a.bonds.contains(b) && !b.bonds.contains(a)) {
-                        int typeCountA = 0;
-                        for (Particle p : a.bonds) {
-                            if (p.getType() == b.getType()) typeCountA++;
-                        }
-                        int typeCountB = 0;
-                        for (Particle p : b.bonds) {
-                            if (p.getType() == a.getType()) typeCountB++;
-                        }
-                        if (typeCountA < LINKS_POSSIBLE[a.getType()][b.getType()] && typeCountB < LINKS_POSSIBLE[b.getType()][a.getType()]) {
-                            canLink = true;
-                        }
-                    }
-                }
-            }
-            else {
-                if (!a.bonds.contains(b) && !b.bonds.contains(a)) {
+        if (d2 < MAX_DIST2) {
+            float dA = a.couplingWith(b) / d2;
+            float dB = b.couplingWith(a) / d2;
+            if (a.freeLinksAvailable() && b.freeLinksAvailable()) {
+                canLink = (d2 < MAX_DIST2 / 4f) &&
+                        notYetLinked(a, b) &&
+                        a.mayLinkTo(b);
+            } else {
+                if (notYetLinked(a, b)) {
                     dA = 1 / d2;
                     dB = 1 / d2;
                 }
             }
-            double angle = Math.atan2(a.y - b.y, a.x - b.x);
-            if(d2 < 1) d2 = 1;
-            if(d2 < NODE_RADIUS * NODE_RADIUS * 4) {
+            double angle = a.angleTo(b);
+            if (d2 < 1) d2 = 1;
+            if (d2 < NODE_RADIUS * NODE_RADIUS * 4) {
                 dA = 1 / d2;
                 dB = 1 / d2;
             }
-            a.sx += (float)Math.cos(angle) * dA * SPEED;
-            a.sy += (float)Math.sin(angle) * dA * SPEED;
-            b.sx -= (float)Math.cos(angle) * dB * SPEED;
-            b.sy -= (float)Math.sin(angle) * dB * SPEED;
+            a.addVelocityToPositiveDirection(angle, dA);
+            b.addVelocityToNegativeDirection(angle, dB);
         }
-        if(canLink) return d2;
+        if (canLink) return d2;
         return -1;
     }
 
-
+    private boolean notYetLinked(Particle a, Particle b) {
+        return !a.isLinkedTo(b) && !b.isLinkedTo(a);
+    }
 }
