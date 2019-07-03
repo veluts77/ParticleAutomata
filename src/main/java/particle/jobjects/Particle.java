@@ -11,10 +11,10 @@ public class Particle {
     private ParticleType type;
     public float x;
     public float y;
-    public float sx;
-    public float sy;
-    public int links;
-    public Set<Particle> bonds;
+    private float sx;
+    private float sy;
+    private int links;
+    private Set<Particle> bonds;
 
     public Particle(ParticleType type, float x, float y) {
         this.type = type;
@@ -134,5 +134,19 @@ public class Particle {
                 sy *= -0.5f;
             }
         }
+    }
+
+    void linkWith(Particle another) {
+        this.bonds.add(another);
+        another.bonds.add(this);
+        this.links++;
+        another.links++;
+    }
+
+    void unlinkFrom(Particle another) {
+        this.links--;
+        another.links--;
+        this.bonds.remove(another);
+        another.bonds.remove(this);
     }
 }

@@ -45,7 +45,7 @@ public class Form extends JFrame implements Runnable {
         long beginTime = System.currentTimeMillis();
 
         drawScene(img);
-        for (int i = 0; i < SKIP_FRAMES; i++) logic();
+        process_logic();
         ((Graphics2D) g).drawImage(img, null, 8, 30);
 
         long endTime = System.currentTimeMillis();
@@ -73,10 +73,10 @@ public class Form extends JFrame implements Runnable {
         g2.setColor(LINK);
         fields.eachLinkDo(link ->
             g2.drawLine(
-                    (int) link.a.x,
-                    (int) link.a.y,
-                    (int) link.b.x,
-                    (int) link.b.y
+                    link.x1(),
+                    link.y1(),
+                    link.x2(),
+                    link.y2()
             )
         );
 
@@ -84,17 +84,19 @@ public class Form extends JFrame implements Runnable {
         showInnerTime(g2, endTime - beginTime);
     }
 
-    private void logic() {
-        fields.logic();
+    private void process_logic() {
+        for (int i = 0; i < SKIP_FRAMES; i++) {
+            fields.logic();
+        }
     }
 
     private void showTime(Graphics g, long time) {
         g.setColor(Color.yellow);
-        g.drawString(String.valueOf(time), 30, 42);
+        g.drawString(String.valueOf(time), 30, 62);
     }
 
     private void showInnerTime(Graphics g, long time) {
         g.setColor(Color.white);
-        g.drawString(String.valueOf(time), 25, 25);
+        g.drawString(String.valueOf(time), 25, 45);
     }
 }
