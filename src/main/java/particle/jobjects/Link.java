@@ -31,19 +31,19 @@ public class Link {
         b.addVelocityToNegativeDirection(angle, LINK_FORCE);
     }
 
-    int x1() {
-        return (int) a.x;
+    int screenX1() {
+        return a.screenX();
     }
 
-    int y1() {
-        return (int) a.y;
+    int screenY1() {
+        return a.screenY();
     }
 
-    int x2() {
-        return (int) b.x;
+    int screenX2() {
+        return b.screenX();
     }
 
-    int y2() {
-        return (int) b.y;
+    int screenY2() {
+        return b.screenY();
     }
 }

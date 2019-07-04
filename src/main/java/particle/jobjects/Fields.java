@@ -56,7 +56,7 @@ class Fields {
     }
 
     private Field fieldFor(Particle p) {
-        return fields[(int) (p.x / MAX_DIST)][(int) (p.y / MAX_DIST)];
+        return fields[p.xField()][p.yField()];
     }
 
     void logic() {
@@ -82,10 +82,10 @@ class Fields {
             for (int j = 0; j < fh; j++) {
                 Field field = fields[i][j];
                 for (int i1 = 0; i1 < field.totalParticles(); i1++) {
-                    Particle a = field.particleByIndex(i1);
-                    if (((int) (a.x / MAX_DIST) != i) || ((int) (a.y / MAX_DIST) != j)) {
-                        field.remove(a);
-                        fieldFor(a).add(a);
+                    Particle p = field.particleByIndex(i1);
+                    if ((p.xField() != i) || (p.yField() != j)) {
+                        field.remove(p);
+                        fieldFor(p).add(p);
                     }
                 }
             }
@@ -180,6 +180,6 @@ class Fields {
     }
 
     private boolean notYetLinked(Particle a, Particle b) {
-        return !a.isLinkedTo(b) && !b.isLinkedTo(a);
+        return a.isNotLinkedTo(b) && b.isNotLinkedTo(a);
     }
 }

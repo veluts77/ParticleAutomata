@@ -63,8 +63,8 @@ public class Form extends JFrame implements Runnable {
         fields.eachParticleDo(p -> {
             g2.setColor(p.getColor());
             g2.fillOval(
-                    (int) p.x - NODE_RADIUS,
-                    (int) p.y - NODE_RADIUS,
+                    p.screenX() - NODE_RADIUS,
+                    p.screenY() - NODE_RADIUS,
                     NODE_RADIUS * 2,
                     NODE_RADIUS * 2
             );
@@ -73,10 +73,10 @@ public class Form extends JFrame implements Runnable {
         g2.setColor(LINK);
         fields.eachLinkDo(link ->
             g2.drawLine(
-                    link.x1(),
-                    link.y1(),
-                    link.x2(),
-                    link.y2()
+                    link.screenX1(),
+                    link.screenY1(),
+                    link.screenX2(),
+                    link.screenY2()
             )
         );
 

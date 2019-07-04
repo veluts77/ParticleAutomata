@@ -9,8 +9,8 @@ import static particle.jobjects.Settings.*;
 public class Particle {
 
     private ParticleType type;
-    public float x;
-    public float y;
+    private float x;
+    private float y;
     private float sx;
     private float sy;
     private int links;
@@ -34,6 +34,22 @@ public class Particle {
         return type.color;
     }
 
+    int screenX() {
+        return (int) x;
+    }
+
+    int screenY() {
+        return (int) y;
+    }
+
+    int xField() {
+        return (int) (x / MAX_DIST);
+    }
+
+    int yField() {
+        return (int) (y / MAX_DIST);
+    }
+
     float squaredDistanceTo(Particle b) {
         return (x - b.x) * (x - b.x) + (y - b.y) * (y - b.y);
     }
@@ -46,8 +62,8 @@ public class Particle {
         return COUPLING[getType()][another.getType()];
     }
 
-    boolean isLinkedTo(Particle another) {
-        return bonds.contains(another);
+    boolean isNotLinkedTo(Particle another) {
+        return !bonds.contains(another);
     }
 
     boolean freeLinksAvailable() {
@@ -63,10 +79,8 @@ public class Particle {
         for (Particle p : another.bonds) {
             if (p.getType() == getType()) typeCountB++;
         }
-        if (typeCountA < LINKS_POSSIBLE[getType()][another.getType()] && typeCountB < LINKS_POSSIBLE[another.getType()][getType()]) {
-            return true;
-        }
-        return false;
+        return typeCountA < LINKS_POSSIBLE[getType()][another.getType()] &&
+                typeCountB < LINKS_POSSIBLE[another.getType()][getType()];
     }
 
     void adjustPosition() {
@@ -79,24 +93,13 @@ public class Particle {
         sy *= 0.98f;
     }
 
-    /**
-     * Not sure about the name - to be improved. TODO
-     * @param angle
-     * @param d
-     */
     void addVelocityToPositiveDirection(double angle, float d) {
         sx += (float)Math.cos(angle) * d * SPEED;
         sy += (float)Math.sin(angle) * d * SPEED;
     }
 
-    /**
-     * Not sure about the name - to be improved. TODO
-     * @param angle
-     * @param d
-     */
     void addVelocityToNegativeDirection(double angle, float d) {
-        sx -= (float)Math.cos(angle) * d * SPEED;
-        sy -= (float)Math.sin(angle) * d * SPEED;
+        addVelocityToPositiveDirection(angle, -d);
     }
 
     void normalizeVelocity() {
