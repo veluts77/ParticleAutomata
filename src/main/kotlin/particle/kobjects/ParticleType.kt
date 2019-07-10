@@ -1,0 +1,14 @@
+package particle.kobjects
+
+import java.awt.*
+
+enum class ParticleType private constructor(
+        val type: Int,
+        val color: Color
+) {
+
+    RED(1, Color(250, 20, 20)),
+    YELLOW(2, Color(200, 140, 100)),
+    BLUE(3, Color(80, 170, 140))
+
+}
