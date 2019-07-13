@@ -1,12 +1,12 @@
-package particle.kobjects
+package particle
 
 
-import particle.kobjects.Settings.COUPLING
-import particle.kobjects.Settings.MAX_DIST
-import particle.kobjects.Settings.NODE_COUNT
-import particle.kobjects.Settings.NODE_RADIUS
-import particle.kobjects.Settings.h
-import particle.kobjects.Settings.w
+import particle.Settings.COUPLING
+import particle.Settings.MAX_DIST
+import particle.Settings.NODE_COUNT
+import particle.Settings.NODE_RADIUS
+import particle.Settings.h
+import particle.Settings.w
 
 internal class Fields {
 

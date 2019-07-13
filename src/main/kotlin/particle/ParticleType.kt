@@ -1,8 +1,11 @@
-package particle.kbetter
+package particle
 
 import java.awt.*
 
-enum class ParticleType constructor(val type: Int, val color: Color) {
+enum class ParticleType private constructor(
+        val type: Int,
+        val color: Color
+) {
 
     RED(1, Color(250, 20, 20)),
     YELLOW(2, Color(200, 140, 100)),

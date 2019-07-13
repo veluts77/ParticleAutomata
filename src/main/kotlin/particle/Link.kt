@@ -1,6 +1,6 @@
-package particle.kobjects
+package particle
 
-import particle.kobjects.Settings.LINK_FORCE
+import particle.Settings.LINK_FORCE
 
 
 class Link(private val a: Particle, private val b: Particle) {

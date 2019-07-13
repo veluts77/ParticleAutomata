@@ -1,9 +1,9 @@
-package particle.kobjects
+package particle
 
-import particle.kobjects.Settings.NODE_RADIUS
-import particle.kobjects.Settings.SKIP_FRAMES
-import particle.kobjects.Settings.h
-import particle.kobjects.Settings.w
+import particle.Settings.NODE_RADIUS
+import particle.Settings.SKIP_FRAMES
+import particle.Settings.h
+import particle.Settings.w
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D

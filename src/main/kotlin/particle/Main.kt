@@ -1,4 +1,4 @@
-package particle.kobjects
+package particle
 
 fun main() {
     val f = Form()

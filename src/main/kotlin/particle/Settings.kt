@@ -1,4 +1,4 @@
-package particle.kobjects
+package particle
 
 object Settings {
     internal val NODE_RADIUS = 5

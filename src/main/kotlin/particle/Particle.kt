@@ -1,14 +1,14 @@
-package particle.kobjects
+package particle
 
 
-import particle.kobjects.Settings.BORDER
-import particle.kobjects.Settings.COUPLING
-import particle.kobjects.Settings.LINKS
-import particle.kobjects.Settings.LINKS_POSSIBLE
-import particle.kobjects.Settings.MAX_DIST
-import particle.kobjects.Settings.SPEED
-import particle.kobjects.Settings.h
-import particle.kobjects.Settings.w
+import particle.Settings.BORDER
+import particle.Settings.COUPLING
+import particle.Settings.LINKS
+import particle.Settings.LINKS_POSSIBLE
+import particle.Settings.MAX_DIST
+import particle.Settings.SPEED
+import particle.Settings.h
+import particle.Settings.w
 import java.awt.*
 import java.util.HashSet
 import kotlin.math.atan2
