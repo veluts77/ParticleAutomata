@@ -36,7 +36,7 @@ internal class Fields {
         for (i in 0 until fw) {
             for (j in 0 until fh) {
                 val field = fields[i][j]
-                for (i1 in 0 until field.totalParticles()) {
+                for (i1 in 0 until field.totalParticles) {
                     val p = field.particleByIndex(i1)
                     consumer.invoke(p)
                 }
@@ -51,7 +51,7 @@ internal class Fields {
     }
 
     private fun fieldFor(p: Particle): Field {
-        return fields[p.xField()][p.yField()]
+        return fields[p.xField][p.yField]
     }
 
     fun logic() {
@@ -65,7 +65,7 @@ internal class Fields {
             var i = 0
             while (i < links.size) {
                 val link = links[i]
-                val d2 = link.squaredDistance()
+                val d2 = link.squaredDistance
                 if (d2 > MAX_DIST2 / 4f) {
                     link.unlink()
                     links.remove(link)
@@ -81,9 +81,9 @@ internal class Fields {
             for (j in 0 until fh) {
                 val field = fields[i][j]
                 val toRemoveParticles = mutableListOf<Particle>()
-                for (i1 in 0 until field.totalParticles()) {
+                for (i1 in 0 until field.totalParticles) {
                     val p = field.particleByIndex(i1)
-                    if (p.xField() != i || p.yField() != j) {
+                    if (p.xField != i || p.yField != j) {
                         //field.remove(p)
                         toRemoveParticles.add(p)
                         fieldFor(p).add(p)
@@ -96,11 +96,11 @@ internal class Fields {
         for (i in 0 until fw) {
             for (j in 0 until fh) {
                 val field = fields[i][j]
-                for (i1 in 0 until field.totalParticles()) {
+                for (i1 in 0 until field.totalParticles) {
                     val a = field.particleByIndex(i1)
                     var particleToLink: Particle? = null
                     var particleToLinkMinDist2 = ((w + h) * (w + h)).toFloat()
-                    for (j1 in i1 + 1 until field.totalParticles()) {
+                    for (j1 in i1 + 1 until field.totalParticles) {
                         val b = field.particleByIndex(j1)
                         val d2 = applyForce(a, b)
                         if (d2 != -1f && d2 < particleToLinkMinDist2) {
@@ -111,7 +111,7 @@ internal class Fields {
                     if (i < fw - 1) {
                         val iNext = i + 1
                         val field1 = fields[iNext][j]
-                        for (j1 in 0 until field1.totalParticles()) {
+                        for (j1 in 0 until field1.totalParticles) {
                             val b = field1.particleByIndex(j1)
                             val d2 = applyForce(a, b)
                             if (d2 != -1f && d2 < particleToLinkMinDist2) {
@@ -123,7 +123,7 @@ internal class Fields {
                     if (j < fh - 1) {
                         val jNext = j + 1
                         val field1 = fields[i][jNext]
-                        for (j1 in 0 until field1.totalParticles()) {
+                        for (j1 in 0 until field1.totalParticles) {
                             val b = field1.particleByIndex(j1)
                             val d2 = applyForce(a, b)
                             if (d2 != -1f && d2 < particleToLinkMinDist2) {
@@ -134,7 +134,7 @@ internal class Fields {
                         if (i < fw - 1) {
                             val iNext = i + 1
                             val field2 = fields[iNext][jNext]
-                            for (j1 in 0 until field2.totalParticles()) {
+                            for (j1 in 0 until field2.totalParticles) {
                                 val b = field2.particleByIndex(j1)
                                 val d2 = applyForce(a, b)
                                 if (d2 != -1f && d2 < particleToLinkMinDist2) {

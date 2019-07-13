@@ -78,10 +78,10 @@ class Form : JFrame(), Runnable {
         g2.color = LINK
         fields.eachLinkDo {
             g2.drawLine(
-                    it.screenX1(),
-                    it.screenY1(),
-                    it.screenX2(),
-                    it.screenY2()
+                    it.screenX1,
+                    it.screenY1,
+                    it.screenX2,
+                    it.screenY2
             )
         }
 

@@ -41,13 +41,11 @@ class Particle(private val particleType: ParticleType, private var x: Float, pri
     internal val screenY: Int
         get() = y.toInt()
 
-    internal fun xField(): Int {
-        return (x / MAX_DIST).toInt()
-    }
+    internal val xField: Int
+        get() = (x / MAX_DIST).toInt()
 
-    internal fun yField(): Int {
-        return (y / MAX_DIST).toInt()
-    }
+    internal val yField: Int
+        get() = (y / MAX_DIST).toInt()
 
     internal fun squaredDistanceTo(b: Particle): Float {
         return (x - b.x) * (x - b.x) + (y - b.y) * (y - b.y)

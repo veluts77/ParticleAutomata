@@ -9,6 +9,21 @@ class Link(private val a: Particle, private val b: Particle) {
         doLink()
     }
 
+    internal val screenX1: Int
+        get() = a.screenX
+
+    internal val screenY1: Int
+        get() = a.screenY
+
+    internal val screenX2: Int
+        get() = b.screenX
+
+    internal val screenY2: Int
+        get() = b.screenY
+
+    internal val squaredDistance: Float
+        get() = a.squaredDistanceTo(b)
+
     private fun doLink() {
         a.linkWith(b)
     }
@@ -17,29 +32,11 @@ class Link(private val a: Particle, private val b: Particle) {
         a.unlinkFrom(b)
     }
 
-    internal fun squaredDistance(): Float {
-        return a.squaredDistanceTo(b)
-    }
-
     internal fun adjustParticlesVelocity() {
         val angle = a.angleTo(b)
         a.addVelocityToPositiveDirection(angle, LINK_FORCE)
         b.addVelocityToNegativeDirection(angle, LINK_FORCE)
     }
 
-    internal fun screenX1(): Int {
-        return a.screenX
-    }
 
-    internal fun screenY1(): Int {
-        return a.screenY
-    }
-
-    internal fun screenX2(): Int {
-        return b.screenX
-    }
-
-    internal fun screenY2(): Int {
-        return b.screenY
-    }
 }
