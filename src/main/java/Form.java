@@ -12,7 +12,7 @@ public class Form extends JFrame implements Runnable {
     private final Color LINK = new Color(255, 230, 0, 100);
 
     private final int NODE_RADIUS = 5;
-    private final int NODE_COUNT = 800;
+    private final int NODE_COUNT = 500;
     private final int MAX_DIST = 100;
     private final int MAX_DIST2 = MAX_DIST * MAX_DIST;
     private final float SPEED = 4f;

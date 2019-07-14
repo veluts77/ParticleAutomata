@@ -16,23 +16,20 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class Particle(private val particleType: ParticleType, private var x: Float, private var y: Float) {
-    private var sx: Float = 0.toFloat()
-    private var sy: Float = 0.toFloat()
-    private var links: Int = 0
-    private val bonds: MutableSet<Particle>
-
-    init {
-        this.sx = 0f
-        this.sy = 0f
-        this.links = 0
-        this.bonds = HashSet()
-    }
+class Particle(
+        private val particleType: ParticleType,
+        private var x: Float,
+        private var y: Float
+) {
+    private var velocityX: Float = 0f
+    private var velocityY: Float = 0f
+    private var linksUsed: Int = 0
+    private val bonds: MutableSet<Particle> = HashSet()
 
     val color: Color
         get() = particleType.color
 
-    val type: Int
+    private val type: Int
         get() = particleType.type - 1
 
     internal val screenX: Int
@@ -64,34 +61,32 @@ class Particle(private val particleType: ParticleType, private var x: Float, pri
     }
 
     internal fun freeLinksAvailable(): Boolean {
-        return links < LINKS[type]
+        return linksUsed < LINKS[type]
     }
 
     internal fun mayLinkTo(another: Particle): Boolean {
-        var typeCountA = 0
-        for (p in bonds) {
-            if (p.type == another.type) typeCountA++
-        }
-        var typeCountB = 0
-        for (p in another.bonds) {
-            if (p.type == type) typeCountB++
-        }
-        return typeCountA < LINKS_POSSIBLE[type][another.type] && typeCountB < LINKS_POSSIBLE[another.type][type]
+        return linksStillAvailableFor(another) &&
+                another.linksStillAvailableFor(this)
     }
 
-    internal fun adjustPosition() {
-        x += sx
-        y += sy
+    private fun linksStillAvailableFor(another: Particle): Boolean {
+        val usedLinks = bonds.count { it.type == another.type }
+        return usedLinks < LINKS_POSSIBLE[type][another.type]
+    }
+
+    internal fun adjustPositionBasedOnVelocity() {
+        x += velocityX
+        y += velocityY
     }
 
     internal fun slowDownVelocity() {
-        sx *= 0.98f
-        sy *= 0.98f
+        velocityX *= 0.98f
+        velocityY *= 0.98f
     }
 
     internal fun addVelocityToPositiveDirection(angle: Double, d: Float) {
-        sx += cos(angle).toFloat() * d * SPEED
-        sy += sin(angle).toFloat() * d * SPEED
+        velocityX += cos(angle).toFloat() * d * SPEED
+        velocityY += sin(angle).toFloat() * d * SPEED
     }
 
     internal fun addVelocityToNegativeDirection(angle: Double, d: Float) {
@@ -99,38 +94,39 @@ class Particle(private val particleType: ParticleType, private var x: Float, pri
     }
 
     internal fun normalizeVelocity() {
-        // velocity normalization
-        // idk if it is still necessary
-        val magnitude = sqrt((sx * sx + sy * sy).toDouble()).toFloat()
+        val magnitude = sqrt(velocityX * velocityX + velocityY * velocityY)
         if (magnitude > 1f) {
-            sx /= magnitude
-            sy /= magnitude
+            velocityX /= magnitude
+            velocityY /= magnitude
         }
+    }
+
+    internal fun detectBorders() {
         // border repulsion
         if (x < BORDER) {
-            sx += SPEED * 0.05f
+            velocityX += SPEED * 0.05f
             if (x < 0) {
                 x = -x
-                sx *= -0.5f
+                velocityX *= -0.5f
             }
         } else if (x > w - BORDER) {
-            sx -= SPEED * 0.05f
+            velocityX -= SPEED * 0.05f
             if (x > w) {
                 x = w * 2 - x
-                sx *= -0.5f
+                velocityX *= -0.5f
             }
         }
         if (y < BORDER) {
-            sy += SPEED * 0.05f
+            velocityY += SPEED * 0.05f
             if (y < 0) {
                 y = -y
-                sy *= -0.5f
+                velocityY *= -0.5f
             }
         } else if (y > h - BORDER) {
-            sy -= SPEED * 0.05f
+            velocityY -= SPEED * 0.05f
             if (y > h) {
                 y = h * 2 - y
-                sy *= -0.5f
+                velocityY *= -0.5f
             }
         }
     }
@@ -138,13 +134,13 @@ class Particle(private val particleType: ParticleType, private var x: Float, pri
     internal fun linkWith(another: Particle) {
         this.bonds.add(another)
         another.bonds.add(this)
-        this.links++
-        another.links++
+        this.linksUsed++
+        another.linksUsed++
     }
 
     internal fun unlinkFrom(another: Particle) {
-        this.links--
-        another.links--
+        this.linksUsed--
+        another.linksUsed--
         this.bonds.remove(another)
         another.bonds.remove(this)
     }

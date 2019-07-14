@@ -7,7 +7,8 @@ import particle.Settings.w
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
-import java.awt.RenderingHints
+import java.awt.RenderingHints.KEY_ANTIALIASING
+import java.awt.RenderingHints.VALUE_ANTIALIAS_ON
 import java.awt.image.BufferedImage
 import javax.swing.ImageIcon
 import javax.swing.JFrame
@@ -15,22 +16,21 @@ import javax.swing.JLabel
 
 class Form : JFrame(), Runnable {
 
-    private val BG = Color(20, 55, 75, 255)
-    private val LINK = Color(255, 230, 0, 100)
+    private val backgroundColor = Color(20, 55, 75, 255)
 
-    private val img = BufferedImage(
+    private val imgBuffer = BufferedImage(
             w, h, BufferedImage.TYPE_INT_RGB)
 
-    private val fields = Fields()
+    private val scene = ParticlesScene()
 
     init {
-        fields.addRandomParticles()
+        scene.addRandomParticles()
 
         this.setSize(w + 16, h + 38)
         this.isVisible = true
-        this.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        this.defaultCloseOperation = EXIT_ON_CLOSE
         this.setLocation(50, 50)
-        this.add(JLabel(ImageIcon(img)))
+        this.add(JLabel(ImageIcon(imgBuffer)))
     }
 
 
@@ -42,16 +42,15 @@ class Form : JFrame(), Runnable {
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-
         }
     }
 
     override fun paint(g: Graphics?) {
         val beginTime = System.currentTimeMillis()
 
-        drawScene(img)
-        process_logic()
-        (g as Graphics2D).drawImage(img, null, 8, 30)
+        drawScene(imgBuffer)
+        processLogic()
+        (g as Graphics2D).drawImage(imgBuffer, null, 8, 30)
 
         val endTime = System.currentTimeMillis()
         showTime(g, endTime - beginTime)
@@ -60,12 +59,24 @@ class Form : JFrame(), Runnable {
     private fun drawScene(image: BufferedImage) {
         val beginTime = System.currentTimeMillis()
 
-        val g2 = image.createGraphics()
-        g2.color = BG
-        g2.fillRect(0, 0, w, h)
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        val g2 = prepareSceneAndGetGraphics(image)
+        drawParticles(g2)
+        drawLinks(g2)
 
-        fields.eachParticleDo {
+        val endTime = System.currentTimeMillis()
+        showInnerTime(g2, endTime - beginTime)
+    }
+
+    private fun prepareSceneAndGetGraphics(img: BufferedImage): Graphics2D {
+        val g2 = img.createGraphics()
+        g2.color = backgroundColor
+        g2.fillRect(0, 0, w, h)
+        g2.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON)
+        return g2
+    }
+
+    private fun drawParticles(g2: Graphics2D) {
+        scene.eachParticleDo {
             g2.color = it.color
             g2.fillOval(
                     it.screenX - NODE_RADIUS,
@@ -74,9 +85,11 @@ class Form : JFrame(), Runnable {
                     NODE_RADIUS * 2
             )
         }
+    }
 
-        g2.color = LINK
-        fields.eachLinkDo {
+    private fun drawLinks(g2: Graphics2D) {
+        g2.color = Link.color
+        scene.eachLinkDo {
             g2.drawLine(
                     it.screenX1,
                     it.screenY1,
@@ -84,15 +97,10 @@ class Form : JFrame(), Runnable {
                     it.screenY2
             )
         }
-
-        val endTime = System.currentTimeMillis()
-        showInnerTime(g2, endTime - beginTime)
     }
 
-    private fun process_logic() {
-        for (i in 0 until SKIP_FRAMES) {
-            fields.logic()
-        }
+    private fun processLogic() {
+        for (i in 0 until SKIP_FRAMES) scene.logic()
     }
 
     private fun showTime(g: Graphics, time: Long) {

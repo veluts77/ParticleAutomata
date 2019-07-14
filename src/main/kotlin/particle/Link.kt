@@ -1,9 +1,14 @@
 package particle
 
 import particle.Settings.LINK_FORCE
+import java.awt.Color
 
 
 class Link(private val a: Particle, private val b: Particle) {
+
+    companion object {
+        internal val color = Color(255, 230, 0, 100)
+    }
 
     init {
         doLink()

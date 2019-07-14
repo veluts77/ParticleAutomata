@@ -8,14 +8,14 @@ import particle.Settings.NODE_RADIUS
 import particle.Settings.h
 import particle.Settings.w
 
-internal class Fields {
+internal class ParticlesScene {
 
     private val fw = w / MAX_DIST + 1
     private val fh = h / MAX_DIST + 1
-    private val MAX_DIST2 = MAX_DIST * MAX_DIST
+    private val squaredMaxDist = MAX_DIST * MAX_DIST
 
     // array for dividing scene into parts to reduce complexity
-    private val fields = Array(fw) { Array<Field>(fh) { Field() } }
+    private val fields = Array(fw) { Array(fh) { Field() } }
 
     private val links: MutableList<Link> = mutableListOf()
 
@@ -56,42 +56,15 @@ internal class Fields {
 
     fun logic() {
         eachParticleDo {
-            it.adjustPosition()
+            it.adjustPositionBasedOnVelocity()
             it.slowDownVelocity()
             it.normalizeVelocity()
+            it.detectBorders()
         }
 
-        run {
-            var i = 0
-            while (i < links.size) {
-                val link = links[i]
-                val d2 = link.squaredDistance
-                if (d2 > MAX_DIST2 / 4f) {
-                    link.unlink()
-                    links.remove(link)
-                    i--
-                } else if (d2 > NODE_RADIUS * NODE_RADIUS * 4) {
-                    link.adjustParticlesVelocity()
-                }
-                i++
-            }
-        }
-        // moving particle to another field
-        for (i in 0 until fw) {
-            for (j in 0 until fh) {
-                val field = fields[i][j]
-                val toRemoveParticles = mutableListOf<Particle>()
-                for (i1 in 0 until field.totalParticles) {
-                    val p = field.particleByIndex(i1)
-                    if (p.xField != i || p.yField != j) {
-                        //field.remove(p)
-                        toRemoveParticles.add(p)
-                        fieldFor(p).add(p)
-                    }
-                }
-                field.removeAll(toRemoveParticles)
-            }
-        }
+        processLinks()
+        moveParticlesThroughFields()
+
         // dividing scene into parts to reduce complexity
         for (i in 0 until fw) {
             for (j in 0 until fh) {
@@ -152,14 +125,46 @@ internal class Fields {
         }
     }
 
+    private fun moveParticlesThroughFields() {
+        for (i in 0 until fw) {
+            for (j in 0 until fh) {
+                val field = fields[i][j]
+                val particlesToRemove = mutableListOf<Particle>()
+                for (i1 in 0 until field.totalParticles) {
+                    val p = field.particleByIndex(i1)
+                    if (p.xField != i || p.yField != j) {
+                        //field.remove(p)
+                        particlesToRemove.add(p)
+                        fieldFor(p).add(p)
+                    }
+                }
+                field.removeAll(particlesToRemove)
+            }
+        }
+    }
+
+    private fun processLinks() {
+        val linksToRemove = mutableListOf<Link>()
+        eachLinkDo {
+            val d2 = it.squaredDistance
+            if (d2 > squaredMaxDist / 4f) {
+                it.unlink()
+                linksToRemove.add(it)
+            } else if (d2 > NODE_RADIUS * NODE_RADIUS * 4) {
+                it.adjustParticlesVelocity()
+            }
+        }
+        links.removeAll(linksToRemove)
+    }
+
     private fun applyForce(a: Particle, b: Particle): Float {
         var d2 = a.squaredDistanceTo(b)
         var canLink = false
-        if (d2 < MAX_DIST2) {
+        if (d2 < squaredMaxDist) {
             var dA = a.couplingWith(b) / d2
             var dB = b.couplingWith(a) / d2
             if (a.freeLinksAvailable() && b.freeLinksAvailable()) {
-                canLink = d2 < MAX_DIST2 / 4f &&
+                canLink = d2 < squaredMaxDist / 4f &&
                         notYetLinked(a, b) &&
                         a.mayLinkTo(b)
             } else {
