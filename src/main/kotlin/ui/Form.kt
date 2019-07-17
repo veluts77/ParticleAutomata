@@ -1,10 +1,13 @@
-package particle
+package ui
 
+import particle.Link
+import particle.ParticlesScene
 import particle.Settings.NODE_RADIUS
 import particle.Settings.SKIP_FRAMES
 import particle.Settings.h
 import particle.Settings.w
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints.KEY_ANTIALIASING
@@ -26,11 +29,13 @@ class Form : JFrame(), Runnable {
     init {
         scene.addRandomParticles()
 
-        this.setSize(w + 16, h + 38)
-        this.isVisible = true
-        this.defaultCloseOperation = EXIT_ON_CLOSE
-        this.setLocation(50, 50)
-        this.add(JLabel(ImageIcon(imgBuffer)))
+        isVisible = true
+        defaultCloseOperation = EXIT_ON_CLOSE
+        setLocation(50, 50)
+        val canvas = JLabel(ImageIcon(imgBuffer))
+        canvas.preferredSize = Dimension(w, h)
+        add(canvas)
+        pack()
     }
 
 
