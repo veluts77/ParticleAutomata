@@ -12,7 +12,7 @@ open class Point(
     internal val screenY: Int
         get() = y.toInt()
 
-    internal fun squaredDistanceTo(another: Point) =
+    internal infix fun squaredDistanceTo(another: Point) =
             (x - another.x) * (x - another.x) +
             (y - another.y) * (y - another.y)
 

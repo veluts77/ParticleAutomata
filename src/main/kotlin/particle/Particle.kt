@@ -37,8 +37,8 @@ class Particle(
     private var linksUsed: Int = 0
     private val bonds: MutableSet<Particle> = HashSet()
 
-    internal fun squaredDistanceTo(b: Particle): Float {
-        return position.squaredDistanceTo(b.position)
+    internal infix fun squaredDistanceTo(b: Particle): Float {
+        return position squaredDistanceTo b.position
     }
 
     internal fun adjustPositionBasedOnVelocity() {
@@ -76,14 +76,14 @@ class Particle(
         }
     }
 
-    internal fun linkWith(another: Particle) {
+    internal infix fun linkWith(another: Particle) {
         this.bonds.add(another)
         another.bonds.add(this)
         this.linksUsed++
         another.linksUsed++
     }
 
-    internal fun unlinkFrom(another: Particle) {
+    internal infix fun unlinkFrom(another: Particle) {
         this.linksUsed--
         another.linksUsed--
         this.bonds.remove(another)

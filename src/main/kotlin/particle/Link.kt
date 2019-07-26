@@ -27,14 +27,14 @@ class Link(private val a: Particle, private val b: Particle) {
         get() = b.screenY
 
     internal val squaredDistance: Float
-        get() = a.squaredDistanceTo(b)
+        get() = a squaredDistanceTo b
 
     private fun doLink() {
-        a.linkWith(b)
+        a linkWith b
     }
 
     internal fun unlink() {
-        a.unlinkFrom(b)
+        a unlinkFrom b
     }
 
     internal fun adjustParticlesVelocity() {

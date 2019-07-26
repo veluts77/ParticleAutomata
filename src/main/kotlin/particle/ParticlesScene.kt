@@ -1,6 +1,5 @@
 package particle
 
-
 import particle.Settings.COUPLING
 import particle.Settings.MAX_DIST
 import particle.Settings.NODE_COUNT
@@ -56,46 +55,84 @@ internal class ParticlesScene {
     }
 
     private fun addNewLinks() {
-        for (i in 0 until fw) {
-            for (j in 0 until fh) {
-                val field = fields[i][j]
-                for (i1 in 0 until field.totalParticles) {
-                    val a = field.particleByIndex(i1)
-                    var particleToLink: Particle? = null
-                    var particleToLinkMinDist2 = ((w + h) * (w + h)).toFloat()
+        eachFieldDo { field ->
+            for (i1 in 0 until field.totalParticles) {
+                val a = field.particleByIndex(i1)
+                var particleToLink: Particle? = null
+                var particleToLinkMinDist2 = ((w + h) * (w + h)).toFloat()
 
-                    fun tryUpdateParticleToLink(b: Particle) {
-                        val d2 = a applyForceTo b
-                        if (d2 != -1f && d2 < particleToLinkMinDist2) {
-                            particleToLinkMinDist2 = d2
-                            particleToLink = b
-                        }
+                fun tryUpdateParticleToLink(b: Particle) {
+                    val d2 = a applyForceTo b
+                    if (d2 != -1f && d2 < particleToLinkMinDist2) {
+                        particleToLinkMinDist2 = d2
+                        particleToLink = b
                     }
-                    // processing the rest of particles in current field
-                    for (j1 in i1 + 1 until field.totalParticles) {
-                        tryUpdateParticleToLink(field.particleByIndex(j1))
+                }
+
+                for (i2 in i1 + 1 until field.totalParticles) {
+                    tryUpdateParticleToLink(field.particleByIndex(i2))
+                }
+
+                setOf(
+                        field.fieldAtRight(),
+                        field.fieldAtBottom(),
+                        field.fieldAtBottomRight()
+                ).forEach { f ->
+                    f.eachParticleDo {
+                        tryUpdateParticleToLink(it)
                     }
-                    if (i < fw - 1) { // checking the field at right
-                        fields[i + 1][j].eachParticleDo {
-                            tryUpdateParticleToLink(it)
-                        }
-                    }
-                    if (j < fh - 1) { // checking the filed at bottom
-                        fields[i][j + 1].eachParticleDo {
-                            tryUpdateParticleToLink(it)
-                        }
-                        if (i < fw - 1) { // checking the field at bottom right
-                            fields[i + 1][j + 1].eachParticleDo {
-                                tryUpdateParticleToLink(it)
-                            }
-                        }
-                    }
-                    if (particleToLink != null) {
-                        links.add(Link(a, particleToLink!!))
-                    }
+                }
+
+                if (particleToLink != null) {
+                    links.add(Link(a, particleToLink!!))
                 }
             }
         }
+    }
+
+    private fun eachFieldDo(consumer: (Field) -> Unit) {
+        fields.forEach { row ->
+            row.forEach {
+                consumer.invoke(it)
+            }
+        }
+    }
+
+    private fun Field.fieldAtRight(): Field {
+        val columnAndRow = this.columnAndRow()
+        if (columnAndRow[0] == -1) return Field()
+        val i = columnAndRow[0]
+        if (i == fw) return Field()
+        val j = columnAndRow[1]
+        return fields[i + 1][j]
+    }
+
+    private fun Field.fieldAtBottom(): Field {
+        val columnAndRow = this.columnAndRow()
+        if (columnAndRow[0] == -1) return Field()
+        val j = columnAndRow[1]
+        if (j == fh) return Field()
+        val i = columnAndRow[0]
+        return fields[i][j + 1]
+    }
+
+    private fun Field.fieldAtBottomRight(): Field {
+        val columnAndRow = this.columnAndRow()
+        if (columnAndRow[0] == -1) return Field()
+        val i = columnAndRow[0]
+        if (i == fw) return Field()
+        val j = columnAndRow[1]
+        if (j == fh) return Field()
+        return fields[i + 1][j + 1]
+    }
+
+    private fun Field.columnAndRow(): Array<Int> {
+        for (i in 0 until fw) {
+            for (j in 0 until fh) {
+                if (fields[i][j] == this) return arrayOf(i, j)
+            }
+        }
+        return arrayOf(-1, -1)
     }
 
     private fun moveParticlesThroughFields() {
