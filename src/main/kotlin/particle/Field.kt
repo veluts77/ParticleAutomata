@@ -18,4 +18,8 @@ class Field internal constructor() {
     internal fun removeAll(toRemove: MutableList<Particle>) {
         particles.removeAll(toRemove)
     }
+
+    internal fun eachParticleDo(consumer: (Particle) -> Unit) {
+        particles.forEach { consumer.invoke(it) }
+    }
 }

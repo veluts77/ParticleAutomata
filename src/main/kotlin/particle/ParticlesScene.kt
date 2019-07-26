@@ -15,7 +15,6 @@ internal class ParticlesScene {
     private val squaredMaxDist = MAX_DIST * MAX_DIST
 
     private val fields = Array(fw) { Array(fh) { Field() } }
-
     private val links: MutableList<Link> = mutableListOf()
 
     fun addRandomParticles() {
@@ -32,25 +31,15 @@ internal class ParticlesScene {
     }
 
     fun eachParticleDo(consumer: (Particle) -> Unit) {
-        for (i in 0 until fw) {
-            for (j in 0 until fh) {
-                val field = fields[i][j]
-                for (i1 in 0 until field.totalParticles) {
-                    val p = field.particleByIndex(i1)
-                    consumer.invoke(p)
-                }
+        fields.forEach { row ->
+            row.forEach { field ->
+                field.eachParticleDo(consumer)
             }
         }
     }
 
     fun eachLinkDo(consumer: (Link) -> Unit) {
-        for (link in links) {
-            consumer.invoke(link)
-        }
-    }
-
-    private fun fieldFor(p: Particle): Field {
-        return fields[p.xField][p.yField]
+        links.forEach(consumer)
     }
 
     fun logic() {
@@ -61,10 +50,12 @@ internal class ParticlesScene {
             it.detectBorders()
         }
 
-        processLinks()
+        processExistingLinks()
         moveParticlesThroughFields()
+        addNewLinks()
+    }
 
-        // dividing scene into parts to reduce complexity
+    private fun addNewLinks() {
         for (i in 0 until fw) {
             for (j in 0 until fh) {
                 val field = fields[i][j]
@@ -72,52 +63,35 @@ internal class ParticlesScene {
                     val a = field.particleByIndex(i1)
                     var particleToLink: Particle? = null
                     var particleToLinkMinDist2 = ((w + h) * (w + h)).toFloat()
-                    for (j1 in i1 + 1 until field.totalParticles) {
-                        val b = field.particleByIndex(j1)
+
+                    fun tryUpdateParticleToLink(b: Particle) {
                         val d2 = a applyForceTo b
                         if (d2 != -1f && d2 < particleToLinkMinDist2) {
                             particleToLinkMinDist2 = d2
                             particleToLink = b
                         }
                     }
-                    if (i < fw - 1) {
-                        val iNext = i + 1
-                        val field1 = fields[iNext][j]
-                        for (j1 in 0 until field1.totalParticles) {
-                            val b = field1.particleByIndex(j1)
-                            val d2 = a applyForceTo b
-                            if (d2 != -1f && d2 < particleToLinkMinDist2) {
-                                particleToLinkMinDist2 = d2
-                                particleToLink = b
-                            }
+                    // processing the rest of particles in current field
+                    for (j1 in i1 + 1 until field.totalParticles) {
+                        tryUpdateParticleToLink(field.particleByIndex(j1))
+                    }
+                    if (i < fw - 1) { // checking the field at right
+                        fields[i + 1][j].eachParticleDo {
+                            tryUpdateParticleToLink(it)
                         }
                     }
-                    if (j < fh - 1) {
-                        val jNext = j + 1
-                        val field1 = fields[i][jNext]
-                        for (j1 in 0 until field1.totalParticles) {
-                            val b = field1.particleByIndex(j1)
-                            val d2 = a applyForceTo b
-                            if (d2 != -1f && d2 < particleToLinkMinDist2) {
-                                particleToLinkMinDist2 = d2
-                                particleToLink = b
-                            }
+                    if (j < fh - 1) { // checking the filed at bottom
+                        fields[i][j + 1].eachParticleDo {
+                            tryUpdateParticleToLink(it)
                         }
-                        if (i < fw - 1) {
-                            val iNext = i + 1
-                            val field2 = fields[iNext][jNext]
-                            for (j1 in 0 until field2.totalParticles) {
-                                val b = field2.particleByIndex(j1)
-                                val d2 = a applyForceTo b
-                                if (d2 != -1f && d2 < particleToLinkMinDist2) {
-                                    particleToLinkMinDist2 = d2
-                                    particleToLink = b
-                                }
+                        if (i < fw - 1) { // checking the field at bottom right
+                            fields[i + 1][j + 1].eachParticleDo {
+                                tryUpdateParticleToLink(it)
                             }
                         }
                     }
                     if (particleToLink != null) {
-                        links.add(Link(a, particleToLink))
+                        links.add(Link(a, particleToLink!!))
                     }
                 }
             }
@@ -141,7 +115,7 @@ internal class ParticlesScene {
         }
     }
 
-    private fun processLinks() {
+    private fun processExistingLinks() {
         val linksToRemove = mutableListOf<Link>()
         eachLinkDo {
             val d2 = it.squaredDistance
@@ -153,5 +127,9 @@ internal class ParticlesScene {
             }
         }
         links.removeAll(linksToRemove)
+    }
+
+    private fun fieldFor(p: Particle): Field {
+        return fields[p.xField][p.yField]
     }
 }
