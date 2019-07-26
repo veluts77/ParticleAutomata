@@ -38,10 +38,8 @@ class Link(private val a: Particle, private val b: Particle) {
     }
 
     internal fun adjustParticlesVelocity() {
-        val angle = a.angleTo(b)
-        a.addVelocityToPositiveDirection(angle, LINK_FORCE)
-        b.addVelocityToNegativeDirection(angle, LINK_FORCE)
+        val angle = a.position angleTo b.position
+        a.velocity.applyForceByAngle(LINK_FORCE, angle)
+        b.velocity.applyForceByAngle(-LINK_FORCE, angle)
     }
-
-
 }

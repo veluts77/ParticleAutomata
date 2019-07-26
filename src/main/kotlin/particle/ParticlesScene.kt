@@ -28,7 +28,7 @@ internal class ParticlesScene {
     }
 
     private fun addOneParticle(type: Int, x: Float, y: Float) {
-        val p = Particle(ParticleType.values()[type], x, y)
+        val p = Particle(ParticleType.values()[type], Point(x, y))
         fieldFor(p).add(p)
     }
 
@@ -57,8 +57,8 @@ internal class ParticlesScene {
     fun logic() {
         eachParticleDo {
             it.adjustPositionBasedOnVelocity()
-            it.slowDownVelocity()
-            it.normalizeVelocity()
+            it.velocity.slowDown()
+            it.velocity.normalize()
             it.detectBorders()
         }
 
@@ -133,7 +133,6 @@ internal class ParticlesScene {
                 for (i1 in 0 until field.totalParticles) {
                     val p = field.particleByIndex(i1)
                     if (p.xField != i || p.yField != j) {
-                        //field.remove(p)
                         particlesToRemove.add(p)
                         fieldFor(p).add(p)
                     }
@@ -173,14 +172,14 @@ internal class ParticlesScene {
                     dB = 1 / d2
                 }
             }
-            val angle = a.angleTo(b)
             if (d2 < 1) d2 = 1f
             if (d2 < NODE_RADIUS * NODE_RADIUS * 4) {
                 dA = 1 / d2
                 dB = 1 / d2
             }
-            a.addVelocityToPositiveDirection(angle, dA)
-            b.addVelocityToNegativeDirection(angle, dB)
+            val angle = a.position angleTo b.position
+            a.velocity.applyForceByAngle(dA, angle)
+            b.velocity.applyForceByAngle(-dB, angle)
         }
         return if (canLink) d2 else -1f
     }
