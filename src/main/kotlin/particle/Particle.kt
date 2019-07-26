@@ -14,17 +14,10 @@ import java.util.*
 
 class Particle(
         private val particleType: ParticleType,
-        val position: Point
+        internal val position: Point
 ) {
-    val velocity = Velocity()
-    private var linksUsed: Int = 0
-    private val bonds: MutableSet<Particle> = HashSet()
-
-    val color: Color
+    internal val color: Color
         get() = particleType.color
-
-    private val type: Int
-        get() = particleType.type - 1
 
     internal val screenX: Int
         get() = position.screenX
@@ -38,30 +31,14 @@ class Particle(
     internal val yField: Int
         get() = (position.y / MAX_DIST).toInt()
 
+    internal val velocity = Velocity()
+
+    private val squaredMaxDist = MAX_DIST * MAX_DIST
+    private var linksUsed: Int = 0
+    private val bonds: MutableSet<Particle> = HashSet()
+
     internal fun squaredDistanceTo(b: Particle): Float {
         return position.squaredDistanceTo(b.position)
-    }
-
-    internal fun couplingWith(another: Particle): Float {
-        return COUPLING[type][another.type]
-    }
-
-    internal fun isNotLinkedTo(another: Particle): Boolean {
-        return !bonds.contains(another)
-    }
-
-    internal fun freeLinksAvailable(): Boolean {
-        return linksUsed < LINKS[type]
-    }
-
-    internal fun mayLinkTo(another: Particle): Boolean {
-        return linksStillAvailableFor(another) &&
-                another.linksStillAvailableFor(this)
-    }
-
-    private fun linksStillAvailableFor(another: Particle): Boolean {
-        val usedLinks = bonds.count { it.type == another.type }
-        return usedLinks < LINKS_POSSIBLE[type][another.type]
     }
 
     internal fun adjustPositionBasedOnVelocity() {
@@ -111,5 +88,62 @@ class Particle(
         another.linksUsed--
         this.bonds.remove(another)
         another.bonds.remove(this)
+    }
+
+    internal infix fun applyForceTo(another: Particle): Float {
+        var d2 = squaredDistanceTo(another)
+        var canLink = false
+        if (d2 < squaredMaxDist) {
+            var dA = couplingWith(another) / d2
+            var dB = another.couplingWith(this) / d2
+            if (freeLinksAvailable() && another.freeLinksAvailable()) {
+                canLink = d2 < squaredMaxDist / 4f &&
+                        notYetLinkedWith(another) &&
+                        mayLinkTo(another)
+            } else {
+                if (notYetLinkedWith(another)) {
+                    dA = 1 / d2
+                    dB = 1 / d2
+                }
+            }
+            if (d2 < 1) d2 = 1f
+            if (d2 < Settings.NODE_RADIUS * Settings.NODE_RADIUS * 4) {
+                dA = 1 / d2
+                dB = 1 / d2
+            }
+            val angle = position angleTo another.position
+            velocity.applyForceByAngle(dA, angle)
+            another.velocity.applyForceByAngle(-dB, angle)
+        }
+        return if (canLink) d2 else -1f
+    }
+
+    private fun couplingWith(another: Particle): Float {
+        return COUPLING[type][another.type]
+    }
+
+    private val type: Int
+        get() = particleType.type - 1
+
+    private fun hasNoLinkTo(another: Particle): Boolean {
+        return !bonds.contains(another)
+    }
+
+    private infix fun notYetLinkedWith(another: Particle): Boolean {
+        return hasNoLinkTo(another) && another.hasNoLinkTo(this)
+    }
+
+    private fun freeLinksAvailable(): Boolean {
+        return linksUsed < LINKS[type]
+    }
+
+    private fun mayLinkTo(another: Particle): Boolean {
+        return linksStillAvailableFor(another) &&
+                another.linksStillAvailableFor(this)
+    }
+
+    private fun linksStillAvailableFor(another: Particle): Boolean {
+        val usedLinks = bonds.count { it.type == another.type }
+        return usedLinks < LINKS_POSSIBLE[type][another.type]
     }
 }

@@ -14,7 +14,6 @@ internal class ParticlesScene {
     private val fh = h / MAX_DIST + 1
     private val squaredMaxDist = MAX_DIST * MAX_DIST
 
-    // array for dividing scene into parts to reduce complexity
     private val fields = Array(fw) { Array(fh) { Field() } }
 
     private val links: MutableList<Link> = mutableListOf()
@@ -75,7 +74,7 @@ internal class ParticlesScene {
                     var particleToLinkMinDist2 = ((w + h) * (w + h)).toFloat()
                     for (j1 in i1 + 1 until field.totalParticles) {
                         val b = field.particleByIndex(j1)
-                        val d2 = applyForce(a, b)
+                        val d2 = a applyForceTo b
                         if (d2 != -1f && d2 < particleToLinkMinDist2) {
                             particleToLinkMinDist2 = d2
                             particleToLink = b
@@ -86,7 +85,7 @@ internal class ParticlesScene {
                         val field1 = fields[iNext][j]
                         for (j1 in 0 until field1.totalParticles) {
                             val b = field1.particleByIndex(j1)
-                            val d2 = applyForce(a, b)
+                            val d2 = a applyForceTo b
                             if (d2 != -1f && d2 < particleToLinkMinDist2) {
                                 particleToLinkMinDist2 = d2
                                 particleToLink = b
@@ -98,7 +97,7 @@ internal class ParticlesScene {
                         val field1 = fields[i][jNext]
                         for (j1 in 0 until field1.totalParticles) {
                             val b = field1.particleByIndex(j1)
-                            val d2 = applyForce(a, b)
+                            val d2 = a applyForceTo b
                             if (d2 != -1f && d2 < particleToLinkMinDist2) {
                                 particleToLinkMinDist2 = d2
                                 particleToLink = b
@@ -109,7 +108,7 @@ internal class ParticlesScene {
                             val field2 = fields[iNext][jNext]
                             for (j1 in 0 until field2.totalParticles) {
                                 val b = field2.particleByIndex(j1)
-                                val d2 = applyForce(a, b)
+                                val d2 = a applyForceTo b
                                 if (d2 != -1f && d2 < particleToLinkMinDist2) {
                                     particleToLinkMinDist2 = d2
                                     particleToLink = b
@@ -154,37 +153,5 @@ internal class ParticlesScene {
             }
         }
         links.removeAll(linksToRemove)
-    }
-
-    private fun applyForce(a: Particle, b: Particle): Float {
-        var d2 = a.squaredDistanceTo(b)
-        var canLink = false
-        if (d2 < squaredMaxDist) {
-            var dA = a.couplingWith(b) / d2
-            var dB = b.couplingWith(a) / d2
-            if (a.freeLinksAvailable() && b.freeLinksAvailable()) {
-                canLink = d2 < squaredMaxDist / 4f &&
-                        notYetLinked(a, b) &&
-                        a.mayLinkTo(b)
-            } else {
-                if (notYetLinked(a, b)) {
-                    dA = 1 / d2
-                    dB = 1 / d2
-                }
-            }
-            if (d2 < 1) d2 = 1f
-            if (d2 < NODE_RADIUS * NODE_RADIUS * 4) {
-                dA = 1 / d2
-                dB = 1 / d2
-            }
-            val angle = a.position angleTo b.position
-            a.velocity.applyForceByAngle(dA, angle)
-            b.velocity.applyForceByAngle(-dB, angle)
-        }
-        return if (canLink) d2 else -1f
-    }
-
-    private fun notYetLinked(a: Particle, b: Particle): Boolean {
-        return a.isNotLinkedTo(b) && b.isNotLinkedTo(a)
     }
 }
