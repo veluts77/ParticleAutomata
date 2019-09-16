@@ -16,13 +16,13 @@ class Particle(
         private val particleType: ParticleType,
         internal val position: Point
 ) {
-    internal val color: Color
+    val color: Color
         get() = particleType.color
 
-    internal val screenX: Int
+    val screenX: Int
         get() = position.screenX
 
-    internal val screenY: Int
+    val screenY: Int
         get() = position.screenY
 
     internal val xField: Int

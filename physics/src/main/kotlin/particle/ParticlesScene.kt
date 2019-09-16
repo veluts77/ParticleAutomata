@@ -7,7 +7,7 @@ import particle.Settings.NODE_RADIUS
 import particle.Settings.h
 import particle.Settings.w
 
-internal class ParticlesScene {
+class ParticlesScene {
 
     private val fw = w / MAX_DIST + 1
     private val fh = h / MAX_DIST + 1

@@ -2,7 +2,7 @@ package particle
 
 import java.awt.*
 
-enum class ParticleType private constructor(
+enum class ParticleType constructor(
         val type: Int,
         val color: Color
 ) {
