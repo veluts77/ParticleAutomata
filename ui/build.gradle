@@ -16,7 +16,7 @@ apply plugin: "kotlin"
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    
+    implementation 'no.tornado:tornadofx:1.7.17'
     implementation project(":physics")
 }
 
