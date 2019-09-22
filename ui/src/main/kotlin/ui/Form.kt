@@ -12,6 +12,8 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints.KEY_ANTIALIASING
 import java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.awt.image.BufferedImage
 import javax.swing.ImageIcon
 import javax.swing.JFrame
@@ -36,6 +38,13 @@ class Form : JFrame(), Runnable {
         canvas.preferredSize = Dimension(w, h)
         add(canvas)
         pack()
+
+        canvas.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent?) {
+                if (e != null)
+                    scene.addOneParticle(1, e.x.toFloat(), e.y.toFloat())
+            }
+        })
     }
 
 

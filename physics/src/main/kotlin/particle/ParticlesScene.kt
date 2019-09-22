@@ -24,7 +24,7 @@ class ParticlesScene {
         }
     }
 
-    private fun addOneParticle(type: Int, x: Float, y: Float) {
+    fun addOneParticle(type: Int, x: Float, y: Float) {
         val p = Particle(ParticleType.values()[type], Point(x, y))
         fieldFor(p).add(p)
     }
