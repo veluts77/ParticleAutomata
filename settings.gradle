@@ -9,4 +9,7 @@
 
 rootProject.name = 'ParticleAutomata'
 
-include 'main', 'ui', 'physics'
+include 'main'
+include 'ui'
+include 'physics'
+include 'fxui'
