@@ -31,5 +31,4 @@ mainClassName = 'MainKt'
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation project(":ui")
-    implementation project(":fxui")
 }
