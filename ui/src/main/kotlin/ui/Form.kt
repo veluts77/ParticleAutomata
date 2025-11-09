@@ -2,7 +2,7 @@ package ui
 
 import particle.Link
 import particle.ParticlesScene
-import particle.Settings.NODE_RADIUS
+import particle.Settings.PARTICLE_RADIUS
 import particle.Settings.SKIP_FRAMES
 import particle.Settings.h
 import particle.Settings.w
@@ -93,10 +93,10 @@ class Form : JFrame(), Runnable {
         scene.eachParticleDo {
             g2.color = it.color
             g2.fillOval(
-                    it.screenX - NODE_RADIUS,
-                    it.screenY - NODE_RADIUS,
-                    NODE_RADIUS * 2,
-                    NODE_RADIUS * 2
+                    it.screenX - PARTICLE_RADIUS,
+                    it.screenY - PARTICLE_RADIUS,
+                    PARTICLE_RADIUS * 2,
+                    PARTICLE_RADIUS * 2
             )
         }
     }

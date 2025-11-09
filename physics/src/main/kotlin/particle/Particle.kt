@@ -107,7 +107,7 @@ class Particle(
                 }
             }
             if (d2 < 1) d2 = 1f
-            if (d2 < Settings.NODE_RADIUS * Settings.NODE_RADIUS * 4) {
+            if (d2 < Settings.PARTICLE_RADIUS * Settings.PARTICLE_RADIUS * 4) {
                 dA = 1 / d2
                 dB = 1 / d2
             }

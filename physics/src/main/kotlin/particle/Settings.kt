@@ -1,8 +1,8 @@
 package particle
 
 object Settings {
-    const val NODE_RADIUS = 5
-    const val NODE_COUNT = 250
+    const val PARTICLE_RADIUS = 5
+    const val PARTICLES_COUNT = 250
     const val MAX_DIST = 100
     const val w = 1000
     const val h = 800

@@ -2,8 +2,8 @@ package particle
 
 import particle.Settings.COUPLING
 import particle.Settings.MAX_DIST
-import particle.Settings.NODE_COUNT
-import particle.Settings.NODE_RADIUS
+import particle.Settings.PARTICLES_COUNT
+import particle.Settings.PARTICLE_RADIUS
 import particle.Settings.h
 import particle.Settings.w
 
@@ -17,7 +17,7 @@ class ParticlesScene {
     private val links: MutableList<Link> = mutableListOf()
 
     fun addRandomParticles() {
-        for (i in 0 until NODE_COUNT) {
+        for (i in 0 until PARTICLES_COUNT) {
             addOneParticle((Math.random() * COUPLING.size).toInt(),
                     (Math.random() * w).toFloat(),
                     (Math.random() * h).toFloat())
@@ -159,7 +159,7 @@ class ParticlesScene {
             if (d2 > squaredMaxDist / 4f) {
                 it.unlink()
                 linksToRemove.add(it)
-            } else if (d2 > NODE_RADIUS * NODE_RADIUS * 4) {
+            } else if (d2 > PARTICLE_RADIUS * PARTICLE_RADIUS * 4) {
                 it.adjustParticlesVelocity()
             }
         }
