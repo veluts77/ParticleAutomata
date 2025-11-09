@@ -3,7 +3,7 @@ package particle
 
 import particle.Settings.BORDER
 import particle.Settings.COUPLING
-import particle.Settings.LINKS
+import particle.Settings.MAX_LINKS_FOR_TYPE
 import particle.Settings.LINKS_POSSIBLE
 import particle.Settings.MAX_DIST
 import particle.Settings.SPEED
@@ -134,7 +134,7 @@ class Particle(
     }
 
     private fun freeLinksAvailable(): Boolean {
-        return linksUsed < LINKS[type]
+        return linksUsed < MAX_LINKS_FOR_TYPE[type]
     }
 
     private fun mayLinkTo(another: Particle): Boolean {

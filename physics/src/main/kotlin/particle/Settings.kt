@@ -17,11 +17,11 @@ object Settings {
             floatArrayOf(1f, 1f, 1f)
     )
 
-    val LINKS = intArrayOf(1, 3, 2)
+    val MAX_LINKS_FOR_TYPE = intArrayOf(1, 3, 2)
 
     val LINKS_POSSIBLE = arrayOf(
             floatArrayOf(0f, 1f, 1f),
             floatArrayOf(1f, 2f, 1f),
-            floatArrayOf(1f, 1f, 2f)
+            floatArrayOf(1f, 1f, 3f)
     )
 }
